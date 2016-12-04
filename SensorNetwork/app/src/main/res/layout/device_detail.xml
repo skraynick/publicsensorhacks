@@ -31,6 +31,12 @@
                 android:layout_height="wrap_content"
                 android:text="@string/get_file_button"
                 android:visibility="gone" />
+            <Button
+                android:id="@+id/btn_return_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Go Back!"
+                android:visibility="visible" />
         </LinearLayout>
         <TextView
             android:id="@+id/device_address"

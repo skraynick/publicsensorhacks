@@ -37,7 +37,7 @@ public class DeviceDetailFragment extends Fragment {
     private View mContentView = null;
     private WifiP2pDevice device;
     private WifiP2pInfo info;
-    ProgressDialog progressDialog = null;
+    static ProgressDialog progressDialog = null;
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -74,6 +74,8 @@ public class DeviceDetailFragment extends Fragment {
                     @Override
                     public void onClick(View v) {
                         ((DeviceListFragment.DeviceActionListener) getActivity()).disconnect();
+                        getActivity().findViewById(R.id.frag_list).setVisibility(View.VISIBLE);
+                        getActivity().findViewById(R.id.frag_detail).setVisibility(View.INVISIBLE);
                     }
                 });
         mContentView.findViewById(R.id.btn_start_client).setOnClickListener(
@@ -87,6 +89,15 @@ public class DeviceDetailFragment extends Fragment {
                         startActivityForResult(intent, CHOOSE_FILE_RESULT_CODE);
                     }
                 });
+        mContentView.findViewById(R.id.btn_return_back).setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        getActivity().findViewById(R.id.frag_list).setVisibility(View.VISIBLE);
+                        getActivity().findViewById(R.id.frag_detail).setVisibility(View.INVISIBLE);
+                    }
+                }
+        );
         return mContentView;
     }
 
@@ -250,5 +261,9 @@ public class DeviceDetailFragment extends Fragment {
             return false;
         }
         return true;
+    }
+
+    public static void closeDialog() {
+        progressDialog.dismiss();
     }
 }

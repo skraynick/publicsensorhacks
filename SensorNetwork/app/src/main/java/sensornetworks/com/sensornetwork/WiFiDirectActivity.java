@@ -37,6 +37,8 @@ import java.util.List;
 
 import broadcastReceivers.WiFiDirectBroadcastReceiver;
 
+import static sensornetworks.com.sensornetwork.DeviceDetailFragment.progressDialog;
+
 public class WiFiDirectActivity extends AppCompatActivity implements SensorEventListener, DeviceListFragment.DeviceActionListener, WifiP2pManager.ConnectionInfoListener {
 
     private SensorManager mSensorManager;
@@ -55,6 +57,9 @@ public class WiFiDirectActivity extends AppCompatActivity implements SensorEvent
 
     private BroadcastReceiver receiver = null;
 
+    public static final int MESSAGE_READ = 0x400 + 1;
+    public static final int MY_HANDLE = 0x400 + 2;
+    public static final int SERVER_PORT = 4545;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,6 +180,9 @@ public class WiFiDirectActivity extends AppCompatActivity implements SensorEvent
                     }
                 });
                 return true;
+            case (android.R.id.home):
+
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -267,6 +275,10 @@ public class WiFiDirectActivity extends AppCompatActivity implements SensorEvent
     @Override
     public void onConnectionInfoAvailable(final WifiP2pInfo info) {
         Log.i(TAG, "Connection info " + info);
+
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
 
     }
 
