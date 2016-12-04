@@ -1,0 +1,15 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="sensornetworks.com.sensornetwork.WiFiDirectActivity" >
+    <item
+        android:id="@+id/atn_direct_enable"
+        android:icon="@android:drawable/ic_menu_call"
+        android:title="Enable p2p"
+        app:showAsAction="ifRoom|withText" />
+    <item
+        android:id="@+id/atn_direct_discover"
+        android:icon="@android:drawable/btn_plus"
+        android:title="Discouver!"
+        app:showAsAction="ifRoom|withText" />
+</menu>
