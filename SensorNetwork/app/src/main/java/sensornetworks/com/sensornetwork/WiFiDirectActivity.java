@@ -15,6 +15,8 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.Settings;
 import android.util.FloatProperty;
 import android.util.Log;
@@ -32,14 +34,18 @@ import android.view.MenuItem;
 import android.widget.Toast;
 import android.net.wifi.p2p.WifiP2pManager.ChannelListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import broadcastReceivers.WiFiDirectBroadcastReceiver;
+import utils.ClientSocketHandler;
+import utils.GroupOwnerSocketHandler;
+import sensornetworks.com.sensornetwork.WiFiDirectSensorFragment.MessageTarget;
 
 import static sensornetworks.com.sensornetwork.DeviceDetailFragment.progressDialog;
 
-public class WiFiDirectActivity extends AppCompatActivity implements SensorEventListener, DeviceListFragment.DeviceActionListener, WifiP2pManager.ConnectionInfoListener {
+public class WiFiDirectActivity extends AppCompatActivity implements MessageTarget, SensorEventListener, DeviceListFragment.DeviceActionListener, WifiP2pManager.ConnectionInfoListener {
 
     private SensorManager mSensorManager;
 
@@ -60,6 +66,7 @@ public class WiFiDirectActivity extends AppCompatActivity implements SensorEvent
     public static final int MESSAGE_READ = 0x400 + 1;
     public static final int MY_HANDLE = 0x400 + 2;
     public static final int SERVER_PORT = 4545;
+    private Handler handler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +75,7 @@ public class WiFiDirectActivity extends AppCompatActivity implements SensorEvent
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-       FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -86,7 +93,7 @@ public class WiFiDirectActivity extends AppCompatActivity implements SensorEvent
 
         // TODO list the information here
         // get the listview from our layout
-        ListView listView = (ListView)this.findViewById(R.id.list_sensors);
+        ListView listView = (ListView) this.findViewById(R.id.list_sensors);
 
         // and populate it with the most basic view available for listviews, a single text view
         // only made final so we can refer to it in our anonymuous innerclass for clickListener impl
@@ -173,6 +180,7 @@ public class WiFiDirectActivity extends AppCompatActivity implements SensorEvent
                         Toast.makeText(WiFiDirectActivity.this, "Discovery Initiated",
                                 Toast.LENGTH_SHORT).show();
                     }
+
                     @Override
                     public void onFailure(int reasonCode) {
                         Toast.makeText(WiFiDirectActivity.this, "Discovery Failed : " + reasonCode,
@@ -182,7 +190,7 @@ public class WiFiDirectActivity extends AppCompatActivity implements SensorEvent
                 return true;
             case (android.R.id.home):
 
-            return true;
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -217,7 +225,7 @@ public class WiFiDirectActivity extends AppCompatActivity implements SensorEvent
     }
 
     @Override
-    public void onResume(){
+    public void onResume() {
         super.onResume();
         mSensorManager.registerListener(this, mLight, SensorManager.SENSOR_DELAY_NORMAL);
         receiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
@@ -238,6 +246,7 @@ public class WiFiDirectActivity extends AppCompatActivity implements SensorEvent
             public void onSuccess() {
                 // WiFiDirectBroadcastReceiver will notify us. Ignore for now.
             }
+
             @Override
             public void onFailure(int reason) {
                 Toast.makeText(WiFiDirectActivity.this, "Connect failed. Retry.",
@@ -253,6 +262,7 @@ public class WiFiDirectActivity extends AppCompatActivity implements SensorEvent
             public void onFailure(int reasonCode) {
                 Log.d(TAG, "Disconnect failed. Reason :" + reasonCode);
             }
+
             @Override
             public void onSuccess() {
                 //fragment.getView().setVisibility(View.GONE);
@@ -267,19 +277,50 @@ public class WiFiDirectActivity extends AppCompatActivity implements SensorEvent
         findViewById(R.id.frag_list).setVisibility(View.INVISIBLE);
         fragment.showDetails(device);
     }
+
     @Override
     public void cancelDisconnect() {
 
     }
 
+    public Handler getHandler() {
+        return handler;
+    }
+
     @Override
-    public void onConnectionInfoAvailable(final WifiP2pInfo info) {
-        Log.i(TAG, "Connection info " + info);
+    public void onConnectionInfoAvailable(final WifiP2pInfo p2pInfo) {
+        Log.i(TAG, "Connection info " + p2pInfo);
+
+        Thread handler = null;
 
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
 
+        if (p2pInfo.isGroupOwner) {
+            Log.d(TAG, "Connected as group owner");
+            try {
+                handler = new GroupOwnerSocketHandler(
+                        ((MessageTarget) this).getHandler());
+                handler.start();
+            } catch (IOException e) {
+                Log.d(TAG,
+                        "Failed to create a server thread - " + e.getMessage());
+                return;
+            }
+        } else {
+            Log.d(TAG, "Connected as peer");
+            handler = new ClientSocketHandler(
+                    ((MessageTarget) this).getHandler(),
+                    p2pInfo.groupOwnerAddress);
+            handler.start();
+        }
+        /*chatFragment = new WiFiChatFragment();
+        getFragmentManager().beginTransaction()
+                .replace(R.id.container_root, chatFragment).commit();
+        statusTxtView.setVisibility(View.GONE);*/
+
     }
+
 
 }
