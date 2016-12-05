@@ -1,5 +1,6 @@
 package sensornetworks.com.sensornetwork;
 
+import android.app.Fragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -67,6 +68,9 @@ public class WiFiDirectActivity extends AppCompatActivity implements MessageTarg
     public static final int MY_HANDLE = 0x400 + 2;
     public static final int SERVER_PORT = 4545;
     private Handler handler = new Handler();
+
+    private WiFiDirectSensorFragment wiFiDirectSensorFragment;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -165,12 +169,6 @@ public class WiFiDirectActivity extends AppCompatActivity implements MessageTarg
                 }
                 return true;
             case R.id.atn_direct_discover:
-
-                /*if (!isWifiP2pEnabled) {
-                    Toast.makeText(WiFiDirectActivity.this, R.string.p2p_off_warning,
-                            Toast.LENGTH_SHORT).show();
-                    return true;
-                }*/
                 final DeviceListFragment fragment = (DeviceListFragment) getFragmentManager()
                         .findFragmentById(R.id.frag_list);
                 fragment.onInitiateDiscovery();
@@ -315,12 +313,10 @@ public class WiFiDirectActivity extends AppCompatActivity implements MessageTarg
                     p2pInfo.groupOwnerAddress);
             handler.start();
         }
-        /*chatFragment = new WiFiChatFragment();
+
+
+        /*wiFiDirectSensorFragment = new WiFiDirectSensorFragment();
         getFragmentManager().beginTransaction()
-                .replace(R.id.container_root, chatFragment).commit();
-        statusTxtView.setVisibility(View.GONE);*/
-
+                .replace(R.id.content_main, wiFiDirectSensorFragment).commit();*/
     }
-
-
 }

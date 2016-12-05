@@ -6,6 +6,7 @@ package utils;
 
 import android.os.Handler;
 import android.util.Log;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,13 +21,16 @@ import sensornetworks.com.sensornetwork.WiFiDirectActivity;
 public class SensorDataManager implements Runnable {
     private Socket socket = null;
     private Handler handler;
+
     public SensorDataManager(Socket socket, Handler handler) {
         this.socket = socket;
         this.handler = handler;
     }
+
     private InputStream iStream;
     private OutputStream oStream;
-    private static final String TAG = "ChatHandler";
+    private static final String TAG = "SensorHandler";
+
     @Override
     public void run() {
         try {
@@ -61,6 +65,7 @@ public class SensorDataManager implements Runnable {
             }
         }
     }
+
     public void write(byte[] buffer) {
         try {
             oStream.write(buffer);

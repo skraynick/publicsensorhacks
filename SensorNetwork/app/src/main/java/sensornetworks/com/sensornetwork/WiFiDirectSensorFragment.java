@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -90,8 +91,9 @@ public class WiFiDirectSensorFragment extends Fragment {
                 if (nameText != null) {
                     nameText.setText(message);
                     if (message.startsWith("Me: ")) {
-
+                        Log.i(WiFiDirectActivity.TAG, message);
                     } else {
+                        Log.i(WiFiDirectActivity.TAG, message);
 
                     }
                 }
